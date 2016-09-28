@@ -1,4 +1,4 @@
-package flume.kafka;
+package com.yg.kafka;
 
 import java.util.Map;
 import java.util.Properties;
@@ -60,13 +60,13 @@ public class KafkaSink extends AbstractSink implements Configurable {
             KeyedMessage<String,byte[]> data=
                     new KeyedMessage<String, byte[]>(topic,e.getBody());
             producer.send(data);
-            tx.close();
-            return Status.READY;
+            tx.commit();
         }catch (Exception e){
             tx.rollback();
             return Status.BACKOFF;
         }finally {
             tx.close();
         }
+        return Status.READY;
     }
 }
