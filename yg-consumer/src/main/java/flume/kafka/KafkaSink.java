@@ -65,6 +65,7 @@ public class KafkaSink extends AbstractSink implements Configurable {
             tx.commit();
         }catch (Exception e){
             tx.rollback();
+            result= Status.BACKOFF;
         }finally {
             tx.close();
         }
