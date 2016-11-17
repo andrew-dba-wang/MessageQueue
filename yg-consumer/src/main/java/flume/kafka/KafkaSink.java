@@ -18,6 +18,7 @@ import org.apache.flume.sink.AbstractSink;
 
 /**
  * Created by liuti on 2016/9/26.
+ * 实际验证，没有问题
  */
 public class KafkaSink extends AbstractSink implements Configurable {
     private String topic;
@@ -47,6 +48,7 @@ public class KafkaSink extends AbstractSink implements Configurable {
 
     }
     public Status process() throws EventDeliveryException{
+        Status result=Status.READY;
         Channel channel=getChannel();
         Transaction tx=channel.getTransaction();
         try{
@@ -55,18 +57,17 @@ public class KafkaSink extends AbstractSink implements Configurable {
             if(e==null)
             {
                 tx.rollback();
-                return Status.BACKOFF;
+                result= Status.BACKOFF;
             }
             KeyedMessage<String,byte[]> data=
                     new KeyedMessage<String, byte[]>(topic,e.getBody());
             producer.send(data);
-            tx.close();
-            return Status.READY;
+            tx.commit();
         }catch (Exception e){
             tx.rollback();
-            return Status.BACKOFF;
         }finally {
             tx.close();
         }
+        return result;
     }
 }
