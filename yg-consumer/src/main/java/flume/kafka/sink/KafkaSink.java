@@ -22,11 +22,16 @@ import java.util.Properties;
  * messages based on a static topic. In this case messages will be published to a random
  * partition.
  */
+/*
+*经验证，使用该sink 必须配置
+* tokafka.sinks.yg_sik_9092.preprocessor=flume.kafka.impl.SimpleMessagePreprocessor
+*
+ */
 public class KafkaSink extends AbstractSink implements Configurable {
     private  static final Logger logger=LoggerFactory.getLogger(KafkaSink.class);
     private  Properties properties;
     private  Producer<String,String> producer;
-    private MessagePreprocessor messagePreProcessor;
+    private  MessagePreprocessor messagePreProcessor;
     private  String topic;
     private  Context context;
 
@@ -63,7 +68,7 @@ public class KafkaSink extends AbstractSink implements Configurable {
             transaction.rollback();
             String errorMsg="Failed to publish event:" + event;
             logger.error(errorMsg);
-            throw new EventDeliveryException(errorMsg,ex);
+            //throw new EventDeliveryException(errorMsg,ex);
         }finally {
             transaction.close();
         }
@@ -75,16 +80,9 @@ public class KafkaSink extends AbstractSink implements Configurable {
         this.context=context;
         Map<String,String> params=context.getParameters();
         properties=new Properties();
-        for(String key:params.keySet()){
-            String value=params.get(key).trim();
-            key=key.trim();
-            if(key.startsWith(Constants.PROPERTY_PREFIX)){
-                // remove the prefix
-                key=key.substring(Constants.PROPERTY_PREFIX.length()+1,key.length());
-                properties.put(key.trim(),value);
-                if(logger.isDebugEnabled()){
-                    logger.debug("Reading a kafka Producer Property:key:"+key+",value:"+value);
-                }
+        for(String key : params.keySet()){
+            if(!key.equals("type")&& !key.equals("channel")){
+                properties.setProperty(key, context.getString(key));
             }
         }
         // get the message Preprocessor if set
