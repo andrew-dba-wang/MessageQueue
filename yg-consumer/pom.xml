@@ -19,8 +19,8 @@
         </pluginManagement>
     </build>
 
-    <groupId>yg-consumer</groupId>
-    <artifactId>yg-consumer</artifactId>
+    <groupId>com.yg-consumer</groupId>
+    <artifactId>com.yg-consumer</artifactId>
     <version>1.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
