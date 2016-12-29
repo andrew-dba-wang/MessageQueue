@@ -1,18 +1,18 @@
-1.##配置测试数据库，开启binlog
+1.#配置测试数据库，开启binlog
 cat  /etc/my.cnf　
 
-## 开启二进制日志功能，可以随便取，最好有含义
+# 开启二进制日志功能，可以随便取，最好有含义
 log-bin=mysql-bin
-## 为每个session 分配的内存，在事务过程中用来存储二进制日志的缓存
+# 为每个session 分配的内存，在事务过程中用来存储二进制日志的缓存
 binlog_cache_size=1M
-## 主从复制的格式, 选择row模式，虽然Canal支持各种模式，但是想用otter，必须用ROW模式
+# 主从复制的格式, 选择row模式，虽然Canal支持各种模式，但是想用otter，必须用ROW模式
 binlog-format=ROW
-## 二进制日志自动删除/过期的天数。默认值为0，表示不自动删除
+# 二进制日志自动删除/过期的天数。默认值为0，表示不自动删除
 expire_logs_days=10
-##设置server_id，一般设置为IP
+#设置server_id，一般设置为IP
 server_id=121
-##跳过主从复制中遇到的所有错误或指定类型的错误，避免slave端复制中断
-## 如：1062错误是指一些主键重复，1032错误是因为主从数据库数据不一致
+#跳过主从复制中遇到的所有错误或指定类型的错误，避免slave端复制中断
+# 如：1062错误是指一些主键重复，1032错误是因为主从数据库数据不一致
 slave_skip_errors=1062
 --------------------------------------------------------------------
 2.编译canal
@@ -32,7 +32,7 @@ tar -zxvf canal.deployer-1.0.23-SNAPSHOT.tar.gz  -C /usr/lib/canal/
 ## mysql serverId
 canal.instance.mysql.slaveId = 122
 # position info
-canal.instance.master.address = 10.10.10.121:3306    ##mysql所在主机地址
+canal.instance.master.address = 10.10.10.121:3306    #mysql所在主机地址
 canal.instance.master.journal.name =mysql-bin.000001
 canal.instance.master.position = 426
 canal.instance.master.timestamp =
@@ -41,8 +41,8 @@ canal.instance.master.timestamp =
 #canal.instance.standby.position =
 #canal.instance.standby.timestamp =
 # username/password
-canal.instance.dbUsername = canal     ##mysql 用户
-canal.instance.dbPassword = canal     ##mysql 密码
+canal.instance.dbUsername = canal     #mysql 用户
+canal.instance.dbPassword = canal     #mysql 密码
 canal.instance.defaultDatabaseName =
 canal.instance.connectionCharset = UTF-8
 # table regex
