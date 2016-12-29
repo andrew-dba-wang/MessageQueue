@@ -1,19 +1,23 @@
 package com.yougou.canal;
 
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.protocol.CanalEntry.*;
 import com.alibaba.otter.canal.protocol.Message;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * Created by liuti on 2016/12/29.
  */
 public class CanalClient {
-    public static void main(String args[]) {
+    public static void main(String args[]) throws  Exception{
         // 创建链接
         CanalConnector connector = CanalConnectors.newSingleConnector(new InetSocketAddress("10.10.10.122",
                 10010), "example", "", "");
@@ -38,18 +42,19 @@ public class CanalClient {
                     }
                 } else {
                     emptyCount = 0;
-                    // System.out.printf("message[batchId=%s,size=%s] \n", batchId, size);
                     printEntry(message.getEntries());
                 }
                 connector.ack(batchId); // 提交确认
-                // connector.rollback(batchId); // 处理失败, 回滚数据
+                //connector.rollback(batchId); // 处理失败, 回滚数据
             }
             System.out.println("empty too many times, exit");
-        } finally {
+        }
+        finally {
             connector.disconnect();
         }
     }
-    private static void printEntry(List<Entry> entrys) {
+
+    private static void printEntry(List<Entry> entrys)  throws  Exception{
         for (Entry entry : entrys) {
             if (entry.getEntryType() == EntryType.TRANSACTIONBEGIN || entry.getEntryType() == EntryType.TRANSACTIONEND) {
                 continue;
@@ -66,24 +71,47 @@ public class CanalClient {
                     entry.getHeader().getLogfileName(), entry.getHeader().getLogfileOffset(),
                     entry.getHeader().getSchemaName(), entry.getHeader().getTableName(),
                     eventType));
+
+            Map<String,String> headerMap=new HashMap<String,String>();
+            headerMap.put("LogfileName",entry.getHeader().getLogfileName());
+            headerMap.put("LogfileOffset",String.valueOf(entry.getHeader().getLogfileOffset()));
+            headerMap.put("SchemaName",entry.getHeader().getSchemaName());
+            headerMap.put("TableName",entry.getHeader().getTableName());
+            headerMap.put("eventType",eventType.toString());
+
             for (RowData rowData : rowChage.getRowDatasList()) {
                 if (eventType == EventType.DELETE) {
-                    printColumn(rowData.getBeforeColumnsList());
+                    printColumn(rowData.getBeforeColumnsList(),headerMap);
                 } else if (eventType == EventType.INSERT) {
-                    printColumn(rowData.getAfterColumnsList());
+                    printColumn(rowData.getAfterColumnsList(),headerMap);
                 } else {
                     System.out.println("-------> before");
-                    printColumn(rowData.getBeforeColumnsList());
+                    printColumn(rowData.getBeforeColumnsList(),headerMap);
                     System.out.println("-------> after");
-                    printColumn(rowData.getAfterColumnsList());
+                    printColumn(rowData.getAfterColumnsList(),headerMap);
                 }
             }
-        }    }
+        }
+    }
 
-    private static void printColumn(List<Column> columns) {
+    private static void printColumn(List<Column> columns) throws Exception {
+        JSONObject  jsonObject = new JSONObject();
         for (Column column : columns) {
             System.out.println(column.getName() + " : " + column.getValue());
-            KafkaProducer.sendMsg("yg_binLog", UUID.randomUUID().toString(), column.getName() + " : " + column.getValue());
+            jsonObject.put(column.getName(),column.getValue());
         }
+        KafkaProducer.sendMsg(Constants.topics, UUID.randomUUID().toString(), jsonObject.toString());
+    }
+
+    private static void printColumn(List<Column> columns,Map<String,String> headerMap) throws Exception {
+        JSONObject  jsonObject = new JSONObject();
+        for(Map.Entry<String,String> entry : headerMap.entrySet()){
+            jsonObject.put(entry.getKey(),entry.getValue());
+        }
+        for (Column column : columns) {
+            System.out.println(column.getName() + " : " + column.getValue());
+            jsonObject.put(column.getName(),column.getValue());
+        }
+        KafkaProducer.sendMsg(Constants.topics, UUID.randomUUID().toString(), jsonObject.toString());
     }
 }
