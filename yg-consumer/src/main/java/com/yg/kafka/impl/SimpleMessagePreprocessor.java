@@ -1,6 +1,6 @@
-package flume.kafka.impl;
+package com.yg.kafka.impl;
 
-import flume.kafka.sink.MessagePreprocessor;
+import com.yg.kafka.sink.MessagePreprocessor;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 
@@ -38,7 +38,7 @@ public class SimpleMessagePreprocessor implements MessagePreprocessor {
      */
     @Override
     public String extractTopic(Event event, Context context) {
-        return context.getString("custom-topic", "default-topic");
+        return context.getString("topic", "storm_topic");
     }
 
     /**

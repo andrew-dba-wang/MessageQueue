@@ -22,6 +22,7 @@
     <groupId>com.yg-consumer</groupId>
     <artifactId>com.yg-consumer</artifactId>
     <version>1.0-SNAPSHOT</version>
+
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>

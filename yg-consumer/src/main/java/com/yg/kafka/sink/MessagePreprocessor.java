@@ -1,4 +1,4 @@
-package flume.kafka.sink;
+package com.yg.kafka.sink;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;

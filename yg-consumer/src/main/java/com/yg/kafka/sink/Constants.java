@@ -1,4 +1,4 @@
-package flume.kafka.sink;
+package com.yg.kafka.sink;
 
 /**
  * Created by liuti on 2016/9/26.

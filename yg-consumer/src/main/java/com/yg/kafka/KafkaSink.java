@@ -1,4 +1,4 @@
-package flume.kafka;
+package com.yg.kafka;
 
 import java.util.Map;
 import java.util.Properties;
@@ -69,6 +69,10 @@ public class KafkaSink extends AbstractSink implements Configurable {
         }finally {
             tx.close();
         }
+<<<<<<< HEAD:yg-consumer/src/main/java/flume/kafka/KafkaSink.java
         return result;
+=======
+        return Status.READY;
+>>>>>>> origin/master:yg-consumer/src/main/java/com/yg/kafka/KafkaSink.java
     }
 }

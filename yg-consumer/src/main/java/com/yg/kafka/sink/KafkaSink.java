@@ -1,4 +1,4 @@
-package flume.kafka.sink;
+package com.yg.kafka.sink;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -9,6 +9,7 @@ import org.apache.flume.sink.AbstractSink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 /**
@@ -22,12 +23,16 @@ import java.util.Properties;
  * messages based on a static topic. In this case messages will be published to a random
  * partition.
  */
+<<<<<<< HEAD:yg-consumer/src/main/java/flume/kafka/sink/KafkaSink.java
 /*
 *经验证，使用该sink 必须配置
 * tokafka.sinks.yg_sik_9092.preprocessor=flume.kafka.impl.SimpleMessagePreprocessor
 *
  */
 public class KafkaSink extends AbstractSink implements Configurable {
+=======
+public class KafkaSink extends AbstractSink implements Configurable,Serializable {
+>>>>>>> origin/master:yg-consumer/src/main/java/com/yg/kafka/sink/KafkaSink.java
     private  static final Logger logger=LoggerFactory.getLogger(KafkaSink.class);
     private  Properties properties;
     private  Producer<String,String> producer;
@@ -115,7 +120,7 @@ public class KafkaSink extends AbstractSink implements Configurable {
             }
         }
 
-        if (messagePreProcessor == null) {
+        if (messagePreProcessor != null) {
             // MessagePreprocessor is not set. So read the topic from the config.
             topic = context.getString(Constants.TOPIC, Constants.DEFAULT_TOPIC);
             if (topic.equals(Constants.DEFAULT_TOPIC)) {
@@ -125,6 +130,7 @@ public class KafkaSink extends AbstractSink implements Configurable {
                 logger.info("Using the static topic: " + topic);
             }
         }
+        producer=new Producer<String, String>(new ProducerConfig(properties));
     }
 
     @Override
@@ -140,5 +146,8 @@ public class KafkaSink extends AbstractSink implements Configurable {
         super.stop();
     }
 
-
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }
