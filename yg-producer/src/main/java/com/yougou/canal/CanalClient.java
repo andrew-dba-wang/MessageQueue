@@ -19,8 +19,8 @@ import java.util.UUID;
 public class CanalClient {
     public static void main(String args[]) throws  Exception{
         // 创建链接
-        CanalConnector connector = CanalConnectors.newSingleConnector(new InetSocketAddress("10.10.10.122",
-                10010), "example", "", "");
+        CanalConnector connector =CanalConnectors.newClusterConnector(Constants.zk_Cluster,"example", "", "");
+        //CanalConnector connector = CanalConnectors.newSingleConnector(new InetSocketAddress("10.10.10.122",10010), "example", "", "");
 
         int batchSize = 1000;
         int emptyCount = 0;

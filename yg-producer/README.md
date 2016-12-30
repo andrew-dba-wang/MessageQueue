@@ -33,8 +33,8 @@ tar -zxvf canal.deployer-1.0.23-SNAPSHOT.tar.gz  -C /usr/lib/canal/
 canal.instance.mysql.slaveId = 122
 #position info
 canal.instance.master.address = 10.10.10.121:3306    #mysql所在主机地址
-canal.instance.master.journal.name =mysql-bin.000001
-canal.instance.master.position = 426
+canal.instance.master.journal.name =mysql-bin.000001  #配置binlog的file 可以不用配置（默认是以当前启动）
+canal.instance.master.position = 426   #配置binlog的postion 可以不用配置（默认是以当前启动）
 canal.instance.master.timestamp =
 #canal.instance.standby.address =
 #canal.instance.standby.journal.name =
@@ -43,7 +43,7 @@ canal.instance.master.timestamp =
 #username/password
 canal.instance.dbUsername = canal     #mysql 用户
 canal.instance.dbPassword = canal     #mysql 密码
-canal.instance.defaultDatabaseName =
+canal.instance.defaultDatabaseName =      #可以指定数据库
 canal.instance.connectionCharset = UTF-8
 #table regex
 canal.instance.filter.regex = .*\\..*
