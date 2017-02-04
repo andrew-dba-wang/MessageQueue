@@ -19,19 +19,21 @@ import java.util.UUID;
 public class CanalClient {
     public static void main(String args[]) throws  Exception{
         // 创建链接
+        //10.10.10.121:2181,10.10.10.122:2181,10.10.11.69:2181
         CanalConnector connector =CanalConnectors.newClusterConnector(Constants.zk_Cluster,"example", "", "");
         //CanalConnector connector = CanalConnectors.newSingleConnector(new InetSocketAddress("10.10.10.122",10010), "example", "", "");
 
-        int batchSize = 1000;
+        int batchSize = 10;
         int emptyCount = 0;
+        long batchId =0;
         try {
             connector.connect();
             connector.subscribe(".*\\..*");
             connector.rollback();
             int totalEmtryCount = 120;
             while (emptyCount < totalEmtryCount) {
-                Message message = connector.getWithoutAck(batchSize); // 获取指定数量的数据
-                long batchId = message.getId();
+                Message message = connector.getWithoutAck(1000); // 获取指定数量的数据
+                batchId = message.getId();
                 int size = message.getEntries().size();
                 if (batchId == -1 || size == 0) {
                     emptyCount++;
@@ -44,10 +46,12 @@ public class CanalClient {
                     emptyCount = 0;
                     printEntry(message.getEntries());
                 }
-                connector.ack(batchId); // 提交确认
-                //connector.rollback(batchId); // 处理失败, 回滚数据
+                //确认已经消费成功，通知server删除数据。基于get获取的batchId进行提交，避免误操作
+                connector.ack(batchId);
             }
-            System.out.println("empty too many times, exit");
+        }catch (Exception e){
+            //回滚上次的get请求，重新获取数据
+            connector.rollback(batchId);
         }
         finally {
             connector.disconnect();
@@ -81,6 +85,7 @@ public class CanalClient {
 
             for (RowData rowData : rowChage.getRowDatasList()) {
                 if (eventType == EventType.DELETE) {
+                    System.out.println("-------> DELETE");
                     printColumn(rowData.getBeforeColumnsList(),headerMap);
                 } else if (eventType == EventType.INSERT) {
                     printColumn(rowData.getAfterColumnsList(),headerMap);

@@ -23,16 +23,13 @@ import java.util.Properties;
  * messages based on a static topic. In this case messages will be published to a random
  * partition.
  */
-<<<<<<< HEAD:yg-consumer/src/main/java/flume/kafka/sink/KafkaSink.java
 /*
 *经验证，使用该sink 必须配置
 * tokafka.sinks.yg_sik_9092.preprocessor=flume.kafka.impl.SimpleMessagePreprocessor
 *
  */
-public class KafkaSink extends AbstractSink implements Configurable {
-=======
+
 public class KafkaSink extends AbstractSink implements Configurable,Serializable {
->>>>>>> origin/master:yg-consumer/src/main/java/com/yg/kafka/sink/KafkaSink.java
     private  static final Logger logger=LoggerFactory.getLogger(KafkaSink.class);
     private  Properties properties;
     private  Producer<String,String> producer;
